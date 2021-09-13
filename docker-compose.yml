@@ -1,0 +1,77 @@
+version: "3"
+
+services:
+  mongo:
+    image: mongo:4.0
+    restart: always
+    container_name: "mongo"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=Ch4ng3ThiSp4S
+      - MONGO_INITDB_ROOT_USERNAME=genieacs
+      - MONGO_INITDB_ROOT_PASSWORD=g3n1eAcS
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/var/log/mongodb
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    expose:
+      - "27017"
+    networks:
+      - genieacs_backend
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo genieacs:g3n1eAcS@localhost --quiet
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  genieacs:
+    depends_on:
+      - "mongo"
+    image: vagkaefer/genieacs-docker
+    restart: always
+    container_name: "genieacs"
+    environment:
+      # CHANGE THIS SALT IN PRODUCTION
+      - GENIEACS_UI_JWT_SECRET=eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiZ2VuaWVhY3MiLCJJc3N1ZXIiOiJnZW5
+      - GENIEACS_CWMP_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-cwmp-access.log
+      - GENIEACS_NBI_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-nbi-access.log
+      - GENIEACS_FS_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-fs-access.log
+      - GENIEACS_UI_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-ui-access.log
+      - GENIEACS_DEBUG_FILE=/var/log/genieacs/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=/opt/genieacs/ext
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://genieacs:g3n1eAcS@mongo
+    ports:
+      - "7547:7547"
+      - "7557:7557"
+      - "7567:7567"
+      - "3000:3000"
+    volumes:
+      - genieacs-logs:/opt/genieacs/logs
+      - supervisor-logs:/opt/genieacs/supervisor/logs
+    networks:
+      - genieacs_backend
+      - genieacs_public
+    healthcheck:
+      test: ["CMD", "wget", "-O", "/dev/null", "http://localhost:3000"]
+      interval: 2m
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  mongo-data:
+  mongo-config:
+  genieacs-logs:
+  supervisor-logs:
+
+networks:
+  #docker network create genieacs_public
+  genieacs_public:
+    external: true
+    driver: bridge
+
+  genieacs_backend:
+    driver: bridge
+    external: false
