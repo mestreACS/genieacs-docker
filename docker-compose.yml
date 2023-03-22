@@ -2,7 +2,7 @@ version: "3"
 
 services:
   mongo:
-    image: mongo:4.0
+    image: mongo:6.0
     restart: always
     container_name: "mongo"
     environment:
@@ -67,9 +67,8 @@ volumes:
   supervisor-logs:
 
 networks:
-  #docker network create genieacs_public
+
   genieacs_public:
-    external: true
     driver: bridge
 
   genieacs_backend:
