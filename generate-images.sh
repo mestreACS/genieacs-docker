@@ -6,7 +6,14 @@
 
 docker pull alpine:3
 
-genieAcsVersions=("1.2.2" "1.2.3" "1.2.4" "1.2.5" "1.2.6" "1.2.8" "1.2.9")
+if [ -z "$1" ]
+then
+  printf "Versão não informada, gerando toda base\n"
+  genieAcsVersions=("1.2.2" "1.2.3" "1.2.4" "1.2.5" "1.2.6" "1.2.8" "1.2.9")
+else
+  printf "Gerando imagem da versão v$1\n"
+  genieAcsVersions=($1)
+fi
 
 for version in "${genieAcsVersions[@]}"
 do
