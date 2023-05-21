@@ -6,10 +6,10 @@ services:
     restart: always
     container_name: "mongo"
     environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=Ch4ng3ThiSp4S
-      - MONGO_INITDB_ROOT_USERNAME=genieacs
-      - MONGO_INITDB_ROOT_PASSWORD=g3n1eAcS
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_ADMIN_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ADMIN_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/var/log/mongodb
     volumes:
@@ -20,7 +20,7 @@ services:
     networks:
       - genieacs_backend
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo genieacs:g3n1eAcS@localhost --quiet
+      test: echo 'db.runCommand("ping").ok' | mongo ${MONGO_USER}:${MONGO_PASSWORD}@localhost --quiet
       interval: 15s
       timeout: 10s
       retries: 5
@@ -29,19 +29,18 @@ services:
   genieacs:
     depends_on:
       - "mongo"
-    image: vagkaefer/genieacs-docker
+    image: vagkaefer/genieacs-docker:1.2.9
     restart: always
     container_name: "genieacs"
     environment:
-      # CHANGE THIS SALT IN PRODUCTION
-      - GENIEACS_UI_JWT_SECRET=eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiZ2VuaWVhY3MiLCJJc3N1ZXIiOiJnZW5
+      - GENIEACS_UI_JWT_SECRET=${UI_JWT_SECRET}
       - GENIEACS_CWMP_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-cwmp-access.log
       - GENIEACS_NBI_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-nbi-access.log
       - GENIEACS_FS_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-fs-access.log
       - GENIEACS_UI_ACCESS_LOG_FILE=/var/log/genieacs/genieacs-ui-access.log
       - GENIEACS_DEBUG_FILE=/var/log/genieacs/genieacs-debug.yaml
       - GENIEACS_EXT_DIR=/opt/genieacs/ext
-      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://genieacs:g3n1eAcS@mongo
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo
     ports:
       - "7547:7547"
       - "7557:7557"
@@ -73,4 +72,3 @@ networks:
 
   genieacs_backend:
     driver: bridge
-    external: false

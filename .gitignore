@@ -1,3 +1,4 @@
 temp/
 create-image.sh
 log-*.txt
+.env
