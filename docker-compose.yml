@@ -29,7 +29,7 @@ services:
   genieacs:
     depends_on:
       - "mongo"
-    image: vagkaefer/genieacs-docker:1.2.9
+    image: vagkaefer/genieacs-docker
     restart: always
     container_name: "genieacs"
     environment:

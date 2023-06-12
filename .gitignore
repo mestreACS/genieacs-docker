@@ -2,3 +2,4 @@ temp/
 create-image.sh
 log-*.txt
 .env
+ext/node_modules

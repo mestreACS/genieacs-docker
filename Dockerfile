@@ -35,4 +35,6 @@ RUN addgroup -S genieacs && \
 
 USER genieacs
 
+COPY ext /opt/genieacs/ext
+
 CMD ["supervisord"]

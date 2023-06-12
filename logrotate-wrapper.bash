@@ -2,7 +2,9 @@
 
 while true 
 do
-# de 12 em 12 horas
-sleep 12h
 logrotate -s /opt/genieacs/logrotate.status /etc/logrotate.conf
+# de 6 em 6 horas
+date
+echo "Sleeping 6 hours"
+sleep 6h
 done
