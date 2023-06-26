@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = true
 
   config.vm.box = "debian/bookworm64" #Debian 12
-  config.vm.box_version = "12.20230602.1"
+  #config.vm.box_version = "12.20230602.1"
 
   config.vm.network "public_network"  
   config.vm.network "forwarded_port", guest: 3000, host: 3000
