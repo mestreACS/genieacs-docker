@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#TODO -> Create generate(version) function
+docker pull alpine:3
 
 # check docker is installed
 
@@ -17,8 +17,8 @@ fi
 
 for version in "${genieAcsVersions[@]}"
 do
-  printf "\n\nGenerating $version\n"
-  docker build --build-arg GENIEACS_VERSION=$version . -t vagkaefer/genieacs-docker:$version 2> ./log-$version.txt
+  printf "Generating $version\n"
+  docker build --push --platform linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/386 --build-arg GENIEACS_VERSION=$version . -t vagkaefer/genieacs-docker:$version 2> ./log-$version.txt
 
   if [ $? -ne 0 ];
   then
@@ -32,7 +32,7 @@ done
 
 printf "Generating Latest (V. $version)\n"
 
-docker build --build-arg GENIEACS_VERSION=$version . -t vagkaefer/genieacs-docker 2> ./log-latest.txt
+docker build --push --platform linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/386 --build-arg GENIEACS_VERSION=$version . -t vagkaefer/genieacs-docker 2> ./log-latest.txt
 
   if [ $? -ne 0 ];
   then
@@ -42,3 +42,8 @@ docker build --build-arg GENIEACS_VERSION=$version . -t vagkaefer/genieacs-docke
     printf "\tOK - Generated\n"
   fi
 
+# TODO Tests
+
+# TODO IF
+
+# TODO push

@@ -7,6 +7,18 @@ ARG GENIEACS_VERSION
 # root is used just to create the container, the genieacs runs with the user genieacs ;)
 USER root
 
+RUN addgroup -S genieacs && \ 
+    adduser -G genieacs -S -h /opt/genieacs genieacs && \
+    set -ex && \
+    apk update && \
+    apk upgrade && \
+    apk add --update --no-cache su-exec nodejs npm supervisor logrotate tzdata && \
+    npm install -g genieacs@${GENIEACS_VERSION}
+
+USER genieacs
+
+RUN mkdir -p /opt/genieacs/ext /opt/genieacs/logs /opt/genieacs/supervisor/logs 
+
 COPY genieacs.env /opt/genieacs/genieacs.env
 
 #this is the default config file location of supervisord
