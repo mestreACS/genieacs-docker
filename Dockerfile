@@ -7,8 +7,8 @@ ARG GENIEACS_VERSION
 # root is used just to create the container, the genieacs runs with the user genieacs ;)
 USER root
 
-RUN addgroup -S genieacs && \ 
-    adduser -G genieacs -S -h /opt/genieacs genieacs && \
+RUN addgroup --gid 1000 -S genieacs && \ 
+    adduser -u 1000 -G genieacs -S -h /opt/genieacs genieacs && \
     set -ex && \
     apk update && \
     apk upgrade && \
@@ -32,10 +32,10 @@ COPY logrotate-wrapper.bash /etc/logrotate-wrapper.bash
 
 COPY logrotate.conf /etc/logrotate.conf
 
-RUN addgroup -S genieacs && \ 
-    adduser -G genieacs -S -h /opt/genieacs genieacs && \
-    set -ex && \
-    apk add --update --no-cache nodejs npm supervisor logrotate tzdata && \
+USER root
+
+RUN set -ex && \
+    apk add --update --no-cache nodejs npm supervisor logrotate tzdata iputils-ping && \
     npm install -g genieacs@${GENIEACS_VERSION} && \
     mkdir -p /opt/genieacs/ext /opt/genieacs/logs /opt/genieacs/supervisor/logs && \
     chmod 600 /opt/genieacs/genieacs.env && \
@@ -43,7 +43,9 @@ RUN addgroup -S genieacs && \
     chown genieacs:genieacs -R /opt/genieacs/ && \
     cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
     apk del tzdata npm && \
-    rm -rf /tmp/* /var/lib/apt/lists/* /var/lib/apt/lists/* 
+    rm -rf /tmp/* /var/lib/apt/lists/* /var/lib/apt/lists/*  && \
+    echo "net.ipv6.conf.all.disable_ipv6 = 0\nnet.ipv6.conf.default.disable_ipv6 = 0\nnet.ipv6.conf.eth0.disable_ipv6 = 0" > /etc/sysctl.d/99-enable-ipv6.conf
+
 
 USER genieacs
 
